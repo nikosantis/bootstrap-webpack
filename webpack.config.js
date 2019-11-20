@@ -3,23 +3,21 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    index: path.resolve(__dirname, 'src/index.js'),
+  },
+  mode: 'development',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'app.bundle.js'
+    filename: 'js/[name].js'
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'src/index.html'
-    }),
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
-      'window.jQuery': 'jquery'
-    }),
-  ],
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        use: 'babel-loader',
+        exclude: /node_modules/,
+      },
       {
         test: /\.(scss)$/,
         use: [
@@ -45,13 +43,24 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|gif|jpg)$/,
-        use: [
-          {
-            'loader': 'file-loader',
-          },
-        ],
+        test: /\.(jpg|png|gif|woff|eot|ttf|svg|mp4|webm)$/,
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 90000,
+          }
+        }
       },
     ]
-  }
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, 'src/index.html')
+    }),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery'
+    })
+  ]
 }
